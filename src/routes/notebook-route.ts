@@ -7,8 +7,6 @@ import {
   updateNoteBookController,
 } from "../controller/notebook-controller";
 import { createNotebookSchema, notebookByIdSchema, updateNotebookSchma } from "../schema/notebook-schema";
-import { ExpressValidator } from "express-validator";
-import { RequestValidatorError } from "../errors";
 import { validateRequestMiddleware } from "../middleware/validate-request";
 
 const router = Router();

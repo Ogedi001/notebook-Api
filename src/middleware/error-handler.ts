@@ -12,7 +12,11 @@ export const errorHandlerMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  
+  if (err instanceof CustomError) {
+    logger.error(err.serializeErrors());
+    return res.status(err.statusCode).json({ errors: err.serializeErrors() });
+  }
+
   // Prisma related errors
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
      if (err.code === "P2002"){

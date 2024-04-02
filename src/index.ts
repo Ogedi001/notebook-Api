@@ -2,11 +2,11 @@ import server from './app';
 import { prisma } from './client';
 import logger from './Logger';
 
-const PORT = process.env.PORT ||9000
+const PORT = process.env.PORT ||3000
 
   logger.info("connected to the database");
   
-server.listen(9000, () => {
+server.listen(3000, () => {
     logger.info(`app running on PORT:${PORT} 🔥🔥🔥`)
 })
 
