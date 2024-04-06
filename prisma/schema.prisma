@@ -13,10 +13,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum Privacy {
+  PRIVATE
+  PUBLIC
+}
+
 model NoteBook{
   id String  @id @default(uuid())
   title       String
   content     String
+  privacy Privacy @default(PRIVATE)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model User{
+  id String  @id @default(uuid())
+  email String @unique
+  firstname  String
+  lastname String
+  isEmailVerified Boolean @default(false)
+  resetPasswordToken   String?            @unique
+  resetPasswordExpires String?            @unique
+  Token                Token[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
 }

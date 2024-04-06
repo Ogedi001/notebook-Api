@@ -9,7 +9,7 @@ import cors from 'cors'
 import { errorHandlerMiddleware, pageNotFound } from "./middleware/index";
 import { StatusCodes } from "http-status-codes";
 import { applicationRoutes } from "./routes";
-import logger from "./Logger";
+
 
 const app:Application = express()
 
@@ -51,6 +51,7 @@ const server = createServer(app)
 
 
 app.get ('/api/v1', (req:Request,res:Response)=>{
+  
     return res.status(StatusCodes.OK).json({ message: "Welcome to Backend Api version 1.0 🔥🔥🔥" })
 })
 
