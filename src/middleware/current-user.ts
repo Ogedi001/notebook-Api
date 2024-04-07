@@ -1,12 +1,13 @@
 /// <reference path="../typings/index.d.ts" />
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { Userpayload, verifyJwtToken } from "../helpers";
+import { checkBlacklist, Userpayload, verifyJwtToken } from "../helpers";
 import { StatusCodes } from "http-status-codes";
 import logger from "../Logger";
+import { BadRequestError } from "../errors";
 
 const AUTH_HEADER_PREFIX = "Bearer";
 let token: any;
-export const currentUserMiddleware: RequestHandler = (
+export const currentUserMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -21,6 +22,10 @@ export const currentUserMiddleware: RequestHandler = (
       .json({ message: "User Not Logged In" });
     return;
   }
+
+  const isBlacklisted = await checkBlacklist(token);
+  if (isBlacklisted) throw new BadRequestError("Invalid Token");
+
   try {
     const payload = verifyJwtToken(token) as Userpayload;
     req.currentUser = payload;

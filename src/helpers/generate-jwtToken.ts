@@ -8,7 +8,6 @@ export interface Userpayload {
   email: string;
   firstname: string;
   lastname: string;
-  privacy:Privacy
   isEmailVerified: boolean;
 }
 
@@ -19,7 +18,7 @@ type ExpireIn = string | undefined
 const secret = process.env.JWT_SECRET || ''
 const expiresIn: ExpireIn= process.env.JWT_EXPIRES_IN;
 
-export const generateJWT = (payload:Userpayload, req:Request)=>{
+export const generateJWT = (payload:Userpayload)=>{
     const userJWT = jwt.sign(payload,secret!,{expiresIn})
     return userJWT
 }

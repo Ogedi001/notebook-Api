@@ -33,6 +33,8 @@ model User{
   email String @unique
   firstname  String
   lastname String
+  middlename String ?
+  password String
   isEmailVerified Boolean @default(false)
   resetPasswordToken   String?            @unique
   resetPasswordExpires String?            @unique
