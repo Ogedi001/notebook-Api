@@ -198,7 +198,7 @@ export const resetPasswordController = async (req: Request, res: Response) => {
     const { resetToken } = req.params;
     const { password , comfirmPassword} = req.body;
     
-    if (password === comfirmPassword)
+    if (password !== comfirmPassword)
     throw new BadRequestError("Password do not Match");
 
     const user = await findUserByResetPasswordToken(resetToken);
@@ -209,7 +209,7 @@ export const resetPasswordController = async (req: Request, res: Response) => {
     await getUserResetPasswordTokenService(user.email, true);
   
     return successResponse(res, StatusCodes.CREATED, {
-      message: "password reset",
+      message: "password reset sucessfully",
     });
 };
  

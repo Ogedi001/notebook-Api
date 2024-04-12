@@ -1,8 +1,11 @@
 import { NoteBook } from "@prisma/client";
 import { prisma } from "../client";
 
-type NoteBookInputData = Pick<NoteBook, "content" | "title">;
-
+export interface NoteBookInputData {
+  content: string;
+  title: string;
+  userId: string;
+}
 export const createNoteBookService = async (
   data: NoteBookInputData
 ): Promise<NoteBook> => {
@@ -50,7 +53,7 @@ export const updateNoteBookService = async (
 };
 
 export const deleteNoteBookService = async (id: string): Promise<NoteBook> => {
-  return prisma.noteBook.delete({
+  return  await prisma.noteBook.delete({
     where: { id: id },
   });
 };

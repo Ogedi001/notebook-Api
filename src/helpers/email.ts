@@ -15,13 +15,12 @@ export const sendEmailVerificationLinkEmail = async (data: {
   const template = fs.readFileSync(templatePath, "utf-8");
   const token = crypto.randomBytes(16).toString("hex");
   await createUserTokenService(data.userId, token);
-  const verificationURL = `${process.env.FRONTEND_BASE_URL}/login/${data.userId}/${token}`;
+  const verificationURL = `${process.env.FRONTEND_BASE_URL}/api/v1/auth/verify-email/${data.userId}/${token}`;
   const ejsData = {
     username: data.username,
     verificationURL,
   };
   const htmlContent = ejs.render(template, ejsData);
-console.log(htmlContent)
   const mailOptions = {
     from: process.env.SMTP_SENDER,
     to: data.email,
@@ -42,7 +41,7 @@ export const sendResetPasswordEmail = async (data: {
     const templatePath = path.join(__dirname, "../../emails/password-reset.ejs");
     const template = fs.readFileSync(templatePath, "utf-8");
     const resetToken = await getUserResetPasswordTokenService(data.email, false);
-    const resetURL = `${process.env.FRONTEND_BASE_URL}/passwordreset/${resetToken}`;
+    const resetURL = `${process.env.FRONTEND_BASE_URL}/api/v1/auth/password-reset/${resetToken}`;
     const ejsData = {
         resetURL
       };
@@ -51,7 +50,7 @@ export const sendResetPasswordEmail = async (data: {
 
   
     const mailOptions = {
-      from: process.env.SMTP_SENDER,
+      from: process.env.SMTP_SENDER!,
       to: data.email,
       subject: "Password Reset Notification",
       html: htmlContent,
