@@ -1,9 +1,12 @@
-import { Request, NextFunction} from "express";
+import { Request,Response, NextFunction, RequestHandler} from "express";
 import { ForbiddenError } from "../errors/forbidden-error";
 import { sendEmailVerificationLinkEmail } from "../helpers";
 
-export const emailVerificationCheck = async (
+
+
+export const emailVerificationCheck: RequestHandler  = async (
   req: Request,
+  _:Response,
   next: NextFunction
 ) => {
   const user = req.currentUser;

@@ -1,4 +1,4 @@
-
+import 'dotenv/config'
 import { mailTransport } from "../utils";
 import crypto from "crypto";
 import fs from "fs";
@@ -21,9 +21,9 @@ export const sendEmailVerificationLinkEmail = async (data: {
     verificationURL,
   };
   const htmlContent = ejs.render(template, ejsData);
-
+console.log(htmlContent)
   const mailOptions = {
-    from: `Notebook Api👻`,
+    from: process.env.SMTP_SENDER,
     to: data.email,
     subject: "Welome on board ✔",
     html: htmlContent,
