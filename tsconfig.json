@@ -111,7 +111,7 @@
   "include": [
     "src/**/*.ts",
     "typings/index.d.ts"
-  ],
+, "src/test/setupTest.js", "src/test/notebook-controller.test.ts"  ],
   // other options...
 }
 

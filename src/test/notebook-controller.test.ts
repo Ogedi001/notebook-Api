@@ -10,16 +10,20 @@ import {
 } from "../controller/notebook-controller";
 import { NoteBook } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
-import { NotFoundError } from "../errors";
-import { title } from "process";
 
 jest.mock("./../service/notebook-service.ts");
+jest.mock("../utils/redis.ts", () => ({
+    redisClient: jest.fn(),
+  }));
 //arrange, act,assert
+
 
 const mockNotebook: NoteBook = {
   id: "1",
   title: "Test Notebook",
   content: "Test Content",
+  userId:"userss",
+  privacy:"PRIVATE",
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -79,6 +83,8 @@ describe("Notebook Controller", () => {
           id: "1",
           title: "Test Notebook",
           content: "Test Content",
+          userId:"userss",
+          privacy:"PRIVATE",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -153,3 +159,5 @@ describe("Notebook Controller", () => {
     });
   });
 });
+
+
