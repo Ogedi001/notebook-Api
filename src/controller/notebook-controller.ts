@@ -34,7 +34,7 @@ export const getAllNoteBooksQuerySearch = async (
   res: Response
 ) => {
   const notebooks = await getNoteBooksQueryService(req.query);
-  if (!notebooks || notebooks.length < 1)
+  if (!notebooks.notebooks || notebooks.notebooks.length < 1)
     throw new NotFoundError("No notebook found");
   return successResponse(res, StatusCodes.OK, notebooks);
 };

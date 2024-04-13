@@ -1,11 +1,24 @@
 import { NoteBook } from "@prisma/client";
 import { prisma } from "../client";
+import { skip } from "node:test";
 
 export interface NoteBookInputData {
   content: string;
   title: string;
   userId: string;
 }
+
+interface Pagination{
+  page: number;
+  limit: number;
+  totalPages: number;
+  totalNotebooks: number;
+};
+export type NotebooksData = {
+  pagination: Pagination;
+  notebooks: NoteBook[];
+};
+
 export const createNoteBookService = async (
   data: NoteBookInputData
 ): Promise<NoteBook> => {
@@ -27,16 +40,35 @@ export const findNoteBookByIdService = async (
 
 export const getNoteBooksQueryService = async (
   query: any
-): Promise<NoteBook[]> => {
+):Promise<NotebooksData>=> {
+  let limit = parseInt(query.limit||'10')
+  let page = (parseInt(query.page||'1'))
+  let startIndex= (page -1)*limit
+ 
+
   let filterQuery: any;
   filterQuery = {
     title: query.title,
   };
-  return await prisma.noteBook.findMany({
+  const notebooks = await prisma.noteBook.findMany({
     where: {
       ...filterQuery,
     },
+    skip:startIndex,
+    take:limit
   });
+  //@desc  getting total users and pages for pagination
+  const totalNotebooks = await prisma.noteBook.count({where:{...filterQuery}})
+  const totalPages = Math.ceil(totalNotebooks / limit)
+  return {
+  pagination:{
+      page,
+      limit,
+      totalPages,
+      totalNotebooks,
+  },
+  notebooks
+}
 };
 export const updateNoteBookService = async (
   id: string,

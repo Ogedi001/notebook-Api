@@ -1,5 +1,5 @@
-import { request, Request, Response } from "express";
-import { successResponse } from "../helpers/success-response";
+import { Request, Response } from "express";
+
 import * as notebookService from "./../service/notebook-service";
 import {
   createNoteBookController,
@@ -78,17 +78,27 @@ describe("Notebook Controller", () => {
 
   describe("getAllNoteBooksQuerySearch", () => {
     it(" it should get all notebook and perform search query with notebook title", async () => {
-      const mockNotebookArray: NoteBook[] = [
-        {
-          id: "1",
-          title: "Test Notebook",
-          content: "Test Content",
-          userId:"userss",
-          privacy:"PRIVATE",
-          createdAt: new Date(),
-          updatedAt: new Date(),
+      const mockNotebookArray: notebookService.NotebooksData = {
+        pagination: {
+            page: 1,
+            limit: 10,
+            totalPages: 1,
+            totalNotebooks: 1,
         },
-      ];
+        notebooks: [
+          {
+            id: "1",
+            title: "Test Notebook",
+            content: "Test Content",
+            userId:"userss",
+            privacy:"PRIVATE",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+    };
+    
+
       (
         notebookService.getNoteBooksQueryService as jest.Mock
       ).mockResolvedValueOnce(mockNotebookArray);
