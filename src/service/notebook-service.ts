@@ -31,15 +31,16 @@ export const createNoteBookService = async (
 };
 
 export const findNoteBookByIdService = async (
-  id: string
+  id: string,
+  userId:string
 ): Promise<NoteBook | null> => {
   return await prisma.noteBook.findUnique({
-    where: { id: id },
+    where: { id: id,userId },
   });
 };
 
 export const getNoteBooksQueryService = async (
-  query: any
+  query: any,userId:string
 ):Promise<NotebooksData>=> {
   let limit = parseInt(query.limit||'10')
   let page = (parseInt(query.page||'1'))
@@ -52,13 +53,14 @@ export const getNoteBooksQueryService = async (
   };
   const notebooks = await prisma.noteBook.findMany({
     where: {
-      ...filterQuery,
+  userId,
+  ...filterQuery,
     },
     skip:startIndex,
     take:limit
   });
   //@desc  getting total users and pages for pagination
-  const totalNotebooks = await prisma.noteBook.count({where:{...filterQuery}})
+  const totalNotebooks = await prisma.noteBook.count({where:{...filterQuery,userId}})
   const totalPages = Math.ceil(totalNotebooks / limit)
   return {
   pagination:{
