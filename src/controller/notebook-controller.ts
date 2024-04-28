@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import {
+  CreatedNoteBookData,
   createNoteBookService,
-  createTagService,
   deleteNoteBookService,
   findNoteBookByIdService,
   getNoteBooksQueryService,
@@ -17,25 +17,19 @@ import { ForbiddenError } from "../errors/forbidden-error";
 import logger from "../Logger";
 import { findUserByIdService } from "../service/auth-user-service";
 
+
+interface NoteBookRequestBody {
+  title: string;
+  content: string;
+  privacy: Privacy;
+  tags: string[];
+}
+
 export const createNoteBookController = async (req: Request, res: Response) => {
-  const { title, content, tags } = req.body as {
-    title: string;
-    content: string;
-    tags?: string;
-  };
-  let tagsArray: string[] = tags ? JSON.parse(tags) : [];
+  const { title, content, tags } = req.body as NoteBookRequestBody;
   const ownerId = req.currentUser?.id!;
   const data: NoteBookInputData = { title, content, ownerId };
-  const notebook = await createNoteBookService(data);
-  if (Object.keys(tagsArray).length > 0) {
-    await Promise.all(
-      tagsArray
-        .filter((tag) => !!tag)
-        .map(async (tag) => {
-          await createTagService(tag, notebook.id);
-        })
-    );
-  }
+    const notebook = await createNoteBookService(data,tags);
   return successResponse(res, StatusCodes.CREATED, notebook);
 };
 
@@ -66,12 +60,16 @@ export const getAllNoteBooksQuerySearch = async (
 
 export const updateNoteBookController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { title, content } = req.body as { title: string; content: string };
+  const { title, content, privacy, tags } = req.body as NoteBookRequestBody;
   const ownerId = req.currentUser?.id!;
-  const data = { title, content, ownerId };
+
+  const data: NoteBookInputData = { title, content, privacy, ownerId };
   const notebook = await findNoteBookByIdService(id, ownerId);
+
   if (!notebook) throw new BadRequestError("Invalid Notebook ID");
-  const updatedNotebook = await updateNoteBookService(id, data);
+
+  const updatedNotebook = await updateNoteBookService(id, data, tags);
+
   return successResponse(res, StatusCodes.OK, updatedNotebook);
 };
 

@@ -1,12 +1,15 @@
-import { NoteBook, Tag, User } from "@prisma/client";
+import { NoteBook, Privacy, Tag, User } from "@prisma/client";
 import { prisma } from "../client";
-import { skip } from "node:test";
+import logger from "../Logger";
 
 export interface NoteBookInputData {
   content: string;
   title: string;
+  privacy?: Privacy;
   ownerId: string;
 }
+
+// export type NoteBookInputData =Partial<Pick<NoteBook,'privacy'>> & Pick<NoteBook,'title'|'content'|'ownerId'>
 
 interface Pagination {
   page: number;
@@ -21,35 +24,34 @@ export type NotebooksData = {
 export type ReturnedNoteBookData = {
   sharedUsers: User[];
 } & NoteBook;
-export type CreatedNoteBookData ={
-  tags:Tag[]
-}& NoteBook
-
+export type CreatedNoteBookData = {
+  tags: Tag[];
+} & NoteBook;
 
 export const createNoteBookService = async (
-  data: NoteBookInputData
-):Promise<CreatedNoteBookData> => {
+  data: NoteBookInputData,
+  tags?: string[]
+): Promise<CreatedNoteBookData> => {
+  console.log(tags);
   const notebook = await prisma.noteBook.create({
     data: {
       ...data,
+      tags: {
+        connectOrCreate: tags && tags
+        ?.filter((tagName) => tagName.trim())
+        .map((tagName) => ({
+          where: { name: tagName },
+          create: { name: tagName },
+        })),
+      },
     },
-    include:{
-      tags:true
-    }
+    include: {
+      tags: true,
+    },
   });
   return notebook;
 };
 
-export const createTagService = async (name:string,id:string):Promise<Tag>=>{
-  return await prisma.tag.create({
-    data:{
-      name,
-      notes:{
-        connect:{id}
-      }
-    }
-  })
-}
 
 
 export const findNoteBookByIdService = async (
@@ -99,18 +101,49 @@ export const getNoteBooksQueryService = async (
     notebooks,
   };
 };
+
 export const updateNoteBookService = async (
   id: string,
-  data: NoteBookInputData
-): Promise<NoteBook> => {
-  return await prisma.noteBook.update({
-    where: {
-      id: id,
-    },
+  data: NoteBookInputData,
+  tags?: string[]
+) => {
+  if (tags && tags.length > 0) {
+    const existingTags = await prisma.tag.findMany({
+      where: { notes: { some: { id: id } } },
+      select: {
+        name: true,
+      },
+    });
+    // get tag in existing tag arry not in incoming tag arry
+    const tagToDelete = existingTags.filter(
+      (tagName) => !tags.includes(tagName.name)
+    );
+
+    if (tagToDelete.length > 0) {
+      await prisma.tag.deleteMany({
+        where: { name: { in: tagToDelete.map((tag) => tag.name) } },
+      });
+    }
+  }
+
+  
+  const updatedNotebook = await prisma.noteBook.update({
+    where: { id: id },
     data: {
       ...data,
+      tags: {
+        connectOrCreate: tags
+          ?.filter((tagName) => tagName.trim())
+          .map((tagName) => ({
+            where: { name: tagName },
+            create: { name: tagName },
+          })),
+      },
     },
+    include: { tags: true },
   });
+
+  return updatedNotebook;
 };
 
 export const shareNoteBookWithUser = async (
@@ -132,3 +165,10 @@ export const deleteNoteBookService = async (id: string): Promise<NoteBook> => {
     where: { id: id },
   });
 };
+
+// connectOrCreate: tags
+//           ?.filter((tagName) => tagName.trim())
+//           .map((tagName) => ({
+//             where: { name: tagName },
+//             create: { name: tagName },
+//           })),

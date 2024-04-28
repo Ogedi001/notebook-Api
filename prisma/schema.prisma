@@ -60,7 +60,7 @@ model NoteBook {
 
 model Tag {
   id        String     @id @default(uuid())
-  name      String     @unique
+  name      String    @unique  
   notes     NoteBook[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
