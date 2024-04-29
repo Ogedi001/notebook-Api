@@ -17,6 +17,10 @@ enum Privacy {
   PRIVATE
   PUBLIC
 }
+enum RoleName {
+  ADMIN
+  USER
+}
 
 model User {
   id                   String     @id @default(uuid())
@@ -28,6 +32,8 @@ model User {
   isEmailVerified      Boolean    @default(false)
   resetPasswordToken   String?    @unique
   resetPasswordExpires String?    @unique
+  roleId                    String
+  role                      Role                @relation(fields: [roleId], references: [id])
   token                Token[]
   ownedNotebooks       NoteBook[] @relation(name: "ownerNotebooks")
   sharedNotebooks      NoteBook[] @relation(name: "sharedNotebooks")
@@ -43,6 +49,14 @@ model Token {
   updatedAt DateTime @updatedAt
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+}
+
+model Role {
+  id   String   @id @default(uuid())
+  roleName RoleName  @unique 
+  user User[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model NoteBook {

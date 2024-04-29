@@ -5,7 +5,6 @@ import {
   deleteNoteBookService,
   findNoteBookByIdService,
   getNoteBooksQueryService,
-  NoteBookInputData,
   shareNoteBookWithUser,
   updateNoteBookService,
 } from "../service/notebook-service";
@@ -16,14 +15,9 @@ import { Privacy } from "@prisma/client";
 import { ForbiddenError } from "../errors/forbidden-error";
 import logger from "../Logger";
 import { findUserByIdService } from "../service/auth-user-service";
+import { NoteBookInputData, NoteBookRequestBody } from "../interface";
 
 
-interface NoteBookRequestBody {
-  title: string;
-  content: string;
-  privacy: Privacy;
-  tags: string[];
-}
 
 export const createNoteBookController = async (req: Request, res: Response) => {
   const { title, content, tags } = req.body as NoteBookRequestBody;
