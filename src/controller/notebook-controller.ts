@@ -79,16 +79,16 @@ export const deleteNoteBookController = async (req: Request, res: Response) => {
 export const shareNoteBookController = async (req: Request, res: Response) => {
   const { notebookId, userIds } = req.body as {
     notebookId: string;
-    userIds: string;
+    userIds: string[];
   };
-  const userIdsArray: string[] = JSON.parse(userIds);
+  //const userIdsArray: string[] = JSON.parse(userIds);
   const userId = req.currentUser?.id!;
   const notebook = await findNoteBookByIdService(notebookId, userId);
   if (!notebook) throw new BadRequestError("Invalid Notebook ID");
   if (notebook.privacy === Privacy.PRIVATE)
     throw new ForbiddenError('"Cannot share a private notebook" ');
   const data = await Promise.all(
-    userIdsArray
+    userIds
       .filter((userId) => {
         return !!userId;
       })

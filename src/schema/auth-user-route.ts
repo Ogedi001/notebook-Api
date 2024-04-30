@@ -1,4 +1,8 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
+
+export const userByIdSchema = () => {
+  return [param("userId").notEmpty().withMessage("userId param is required")];
+};
 
 export const registerUserSchema = () => {
   return [

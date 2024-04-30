@@ -1,7 +1,7 @@
 import { User, Token, RoleName, Role } from "@prisma/client";
 import { prisma } from "../client";
 import crypto from "crypto";
-import { OwnedNotebook, SharedNotebook, UserRole } from "../interface";
+import { OwnedNotebook, Pagination_User, SharedNotebook, UserRole } from "../interface";
 
 export type UserAccount = Partial<
   Pick<User, "resetPasswordExpires" | "resetPasswordToken" | "middlename">
@@ -14,6 +14,18 @@ export type UserData = Partial<Pick<User, "password">> &
   export type ReturnedUser ={
     role:UserRole
   }& UserData
+
+  export type ReturnedUsers={
+    pagination:Pagination_User
+    users: {
+      id: string;
+      email: string;
+      firstname: string;
+      lastname: string;
+      middlename: string | null;
+      role:UserRole
+  }[];
+  }
 
 export type ReturnedUserData = {
   ownedNotebooks: OwnedNotebook[];
@@ -147,6 +159,55 @@ export const findUserByIdService = async (userId: string):Promise<ReturnedUserDa
   });
   return user
 };
+
+export const getAllUsers=async(query:any):Promise<ReturnedUsers>=>{
+  let limit = parseInt(query.limit || "10");
+  let page = parseInt(query.page || "1");
+  let startIndex = (page - 1) * limit;
+
+  let filterQuery:any={
+    firstname:query.firstname,
+    lastname:query.lastname,
+    role:{
+      roleName:query.roleName
+    }
+  }
+  const users= await prisma.user.findMany({
+    where:{
+     ...filterQuery
+    },
+    select: {
+      id: true,
+      firstname: true,
+      lastname: true,
+      middlename:true,
+      email:true,
+      role:{
+        select:{
+          id:true,
+          roleName:true
+        }
+      },
+      },
+      skip:startIndex,
+      take:limit
+  })
+
+  //@ desc  total users for pagination
+  const totalUsers = await prisma.user.count({where:{
+    ...filterQuery
+  }})
+  const totalPages = Math.ceil(totalUsers/limit)
+return{
+  pagination:{
+    page,
+    limit,
+    totalPages,
+    totalUsers,
+  },
+  users
+}
+}
 
 export const updatePassword = async (email: string, password: string) => {
   const user = await prisma.user.update({
