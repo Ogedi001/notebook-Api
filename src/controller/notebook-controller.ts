@@ -77,27 +77,34 @@ export const deleteNoteBookController = async (req: Request, res: Response) => {
 };
 
 export const shareNoteBookController = async (req: Request, res: Response) => {
-  const { notebookId, userIds } = req.body as {
-    notebookId: string;
+  const {userIds } = req.body as {
     userIds: string[];
   };
-  //const userIdsArray: string[] = JSON.parse(userIds);
-  const userId = req.currentUser?.id!;
-  const notebook = await findNoteBookByIdService(notebookId, userId);
+  const{notebookId}= req.params
+  const ownerId= req.currentUser?.id!;
+  const notebook = await findNoteBookByIdService(notebookId, ownerId);
   if (!notebook) throw new BadRequestError("Invalid Notebook ID");
   if (notebook.privacy === Privacy.PRIVATE)
     throw new ForbiddenError('"Cannot share a private notebook" ');
+
+  const validUserIds = userIds.filter(userId => !!userId);
+  if (validUserIds.length === 0) {
+    throw new BadRequestError("No valid user IDs provided");
+  }
+
   const data = await Promise.all(
-    userIds
-      .filter((userId) => {
-        return !!userId;
-      })
-      .map(async (userId) => {
+    validUserIds.map(async (userId) => {
         const id = await findUserByIdService(userId);
         if (!id) {
           logger.info(`User with ID ${userId} not found, skipping...`);
           return null;
         }
+
+        if(ownerId===userId){
+          logger.info(`Cannot share to yourself, skipping...`);
+          return null;
+        }
+
         const alreadyShared = notebook.sharedUsers.some(
           (sharedUser) => sharedUser.id === userId
         );
@@ -112,7 +119,8 @@ export const shareNoteBookController = async (req: Request, res: Response) => {
         return notebookUpdate;
       })
   );
-  const numberOfUsersSharedWith = data.length;
+  const filteredData = data.filter(item => item !== null);
+  const numberOfUsersSharedWith = filteredData.length;
   if (numberOfUsersSharedWith === 0)
     throw new BadRequestError("Failed to share notebook");
 

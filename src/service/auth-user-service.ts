@@ -30,7 +30,7 @@ export type UserData = Partial<Pick<User, "password">> &
 export type ReturnedUserData = {
   ownedNotebooks: OwnedNotebook[];
   sharedNotebooks: SharedNotebook[]
-} & UserData
+} & ReturnedUser
 
 export type UserSettings = Pick<User, "firstname" | "lastname" | "middlename">;
 
@@ -126,6 +126,12 @@ export const findUserByIdService = async (userId: string):Promise<ReturnedUserDa
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
+      role:{
+        select:{
+          id:true,
+          roleName:true,
+        }
+      },
       ownedNotebooks: {
         select: {
           id: true,

@@ -10,6 +10,7 @@ import {
 import {
   createNotebookSchema,
   notebookByIdSchema,
+  shareNotebookSchema,
   updateNotebookSchma,
 } from "../schema/notebook-schema";
 import { validateRequestMiddleware } from "../middleware/validate-request";
@@ -45,8 +46,10 @@ router
   );
 
   router
-  .route("/share")
-  .post(
+  .route("/:notebookId/share")
+  .patch(
+    shareNotebookSchema(),
+    validateRequestMiddleware,
     shareNoteBookController
   )
 

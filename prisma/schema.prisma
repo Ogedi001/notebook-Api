@@ -53,7 +53,7 @@ model Token {
 
 model Role {
   id   String   @id @default(uuid())
-  roleName RoleName  @unique 
+  roleName RoleName  @unique @default(USER)
   user User[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

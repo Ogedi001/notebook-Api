@@ -237,6 +237,7 @@ export const getUserByIdSController = async (
   if (!user) {
     throw new BadRequestError("Invalid User ID");
   }
+  delete user.password
   return successResponse(res, StatusCodes.OK, user);
 };
 

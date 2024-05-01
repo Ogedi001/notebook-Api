@@ -37,6 +37,6 @@ export const shareNotebookSchema = () => {
   return [
     body("userIds").notEmpty().withMessage("Please provide your first name"
     ).isArray().withMessage('userIds is an array of userIds'),
-    body("notebookId").notEmpty().withMessage("Please provide your last name"),
+    param("notebookId").notEmpty().withMessage("Please provide your last name"),
   ]
 }
