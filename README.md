@@ -4,7 +4,24 @@ Welcome to the documentation for My Notebook API!
 
 ## Introduction
 
-My Notebook API provides endpoints for managing notebooks and user authentication.
+My Notebook API a simple note-taking application that provides endpoints for managing notebooks(including notebook tagging and sharing between users and users) and authentication.
+
+## Technologies Used
+- Node.js
+- Express.js
+- TypeScript
+- Prisma(Postgres DB)
+- JWT (JSON Web Tokens)
+- bcrypt
+- EJS
+- Express-validator
+- Jest (for testing)
+- Nodemailer
+- Redis
+- Winston (for logging)
+- CORS
+- Helmet
+- dotenv
 
 ## Documentation
 
