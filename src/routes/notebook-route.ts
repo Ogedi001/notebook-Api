@@ -4,11 +4,13 @@ import {
   deleteNoteBookController,
   getAllNoteBooksQuerySearch,
   getNoteBookByIdServiceController,
+  shareNoteBookController,
   updateNoteBookController,
-} from "../controller/notebook-controller";
+} from "../controller";
 import {
   createNotebookSchema,
   notebookByIdSchema,
+  shareNotebookSchema,
   updateNotebookSchma,
 } from "../schema/notebook-schema";
 import { validateRequestMiddleware } from "../middleware/validate-request";
@@ -42,5 +44,13 @@ router
     validateRequestMiddleware,
     deleteNoteBookController
   );
+
+  router
+  .route("/:notebookId/share")
+  .patch(
+    shareNotebookSchema(),
+    validateRequestMiddleware,
+    shareNoteBookController
+  )
 
 export { router as NotebookRoute };

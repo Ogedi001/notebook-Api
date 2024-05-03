@@ -9,6 +9,10 @@ export interface Userpayload {
   firstname: string;
   lastname: string;
   isEmailVerified: boolean;
+  role:{
+    name:string,
+    roleId:string
+  }
 }
 
 

@@ -1,5 +1,4 @@
 import { body, param, query } from "express-validator";
-import { title } from "process";
 
 export const createNotebookSchema = () => {
   return [
@@ -13,6 +12,7 @@ export const createNotebookSchema = () => {
       .withMessage("content is require in req body")
       .isString()
       .withMessage("content must be a string"),
+    
   ];
 };
 
@@ -32,3 +32,11 @@ export const updateNotebookSchma = () => {
       .withMessage("content must be a string"),
   ];
 };
+
+export const shareNotebookSchema = () => {
+  return [
+    body("userIds").notEmpty().withMessage("Please provide your first name"
+    ).isArray().withMessage('userIds is an array of userIds'),
+    param("notebookId").notEmpty().withMessage("Please provide your last name"),
+  ]
+}

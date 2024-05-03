@@ -13,37 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum Privacy {
   PRIVATE
   PUBLIC
 }
-
-model NoteBook{
-  id String  @id @default(uuid())
-  title       String
-  content     String
-  privacy Privacy @default(PRIVATE)
-  userId   String
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+enum RoleName {
+  ADMIN
+  USER
 }
 
-model User{
-  id String  @id @default(uuid())
-  email String @unique
-  firstname  String
-  lastname String
-  middlename String ?
-  password String
-  isEmailVerified Boolean @default(false)
-  resetPasswordToken   String?            @unique
-  resetPasswordExpires String?            @unique
+model User {
+  id                   String     @id @default(uuid())
+  email                String     @unique
+  firstname            String
+  lastname             String
+  middlename           String?
+  password             String
+  isEmailVerified      Boolean    @default(false)
+  resetPasswordToken   String?    @unique
+  resetPasswordExpires String?    @unique
+  roleId                    String
+  role                      Role                @relation(fields: [roleId], references: [id])
   token                Token[]
-  notebook NoteBook[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  ownedNotebooks       NoteBook[] @relation(name: "ownerNotebooks")
+  sharedNotebooks      NoteBook[] @relation(name: "sharedNotebooks")
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
 }
 
 model Token {
@@ -54,4 +49,33 @@ model Token {
   updatedAt DateTime @updatedAt
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+}
+
+model Role {
+  id   String   @id @default(uuid())
+  roleName RoleName  @unique @default(USER)
+  user User[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model NoteBook {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  privacy     Privacy  @default(PRIVATE)
+  ownerId     String
+  owner       User     @relation(name: "ownerNotebooks", fields: [ownerId], references: [id], onDelete: Cascade)
+  sharedUsers User[]   @relation(name: "sharedNotebooks")
+  tags        Tag[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id        String     @id @default(uuid())
+  name      String    @unique  
+  notes     NoteBook[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
