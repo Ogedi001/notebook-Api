@@ -3,6 +3,7 @@ import {
   CreatedNoteBookData,
   createNoteBookService,
   deleteNoteBookService,
+  filterNoteBookByTagName,
   findNoteBookByIdService,
   getNoteBooksQueryService,
   shareNoteBookWithUser,
@@ -15,7 +16,7 @@ import { Privacy } from "@prisma/client";
 import { ForbiddenError } from "../errors/forbidden-error";
 import logger from "../Logger";
 import { findUserByIdService } from "../service/auth-user-service";
-import { NoteBookInputData, NoteBookRequestBody } from "../interface";
+import { FilterData, NoteBookInputData, NoteBookRequestBody } from "../interface";
 
 
 
@@ -67,14 +68,7 @@ export const updateNoteBookController = async (req: Request, res: Response) => {
   return successResponse(res, StatusCodes.OK, updatedNotebook);
 };
 
-export const deleteNoteBookController = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const userId = req.currentUser?.id!;
-  const notebook = await findNoteBookByIdService(id, userId);
-  if (!notebook) throw new BadRequestError("Invalid Notebook ID");
-  const deletedNotebook = await deleteNoteBookService(id);
-  return successResponse(res, StatusCodes.OK, deletedNotebook);
-};
+
 
 export const shareNoteBookController = async (req: Request, res: Response) => {
   const {userIds } = req.body as {
@@ -129,4 +123,31 @@ export const shareNoteBookController = async (req: Request, res: Response) => {
     StatusCodes.OK,
     `Notebook shared to ${numberOfUsersSharedWith} successfully`
   );
+};
+
+
+export const filterNoteBookByTagNameController = async (
+  req: Request,
+  res: Response
+) => {
+  const ownerId = req.currentUser?.id!;
+  const { tagName } = req.body;
+  const data:FilterData= {
+    ownerId,
+    tagName
+  }
+  const notebooks = await filterNoteBookByTagName(req.query,data);
+  if (!notebooks.notebooks || notebooks.notebooks.length < 1)
+    throw new NotFoundError("No notebook found");
+  return successResponse(res, StatusCodes.OK, notebooks);
+};
+
+
+export const deleteNoteBookController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userId = req.currentUser?.id!;
+  const notebook = await findNoteBookByIdService(id, userId);
+  if (!notebook) throw new BadRequestError("Invalid Notebook ID");
+  const deletedNotebook = await deleteNoteBookService(id);
+  return successResponse(res, StatusCodes.OK, deletedNotebook);
 };

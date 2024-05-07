@@ -43,3 +43,7 @@ export interface SharedNotebook {
     ownerId: String;
     tags:Tag[]
   }
+export interface FilterData{
+  ownerId:string,
+  tagName:string
+}

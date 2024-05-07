@@ -1,4 +1,4 @@
-import { Token, User } from "@prisma/client";
+import { RoleName, Token, User } from "@prisma/client";
 import * as authUserService from "../service/auth-user-service";
 import { Request, Response ,NextFunction} from "express";
 import { StatusCodes } from "http-status-codes";
@@ -42,6 +42,11 @@ const createMockUser = async () => {
     isEmailVerified: true,
     resetPasswordExpires: null,
     resetPasswordToken: null,
+    roleId:'123abc',
+    role:{
+      roleId:'123abc',
+      roleName:RoleName.USER
+    }
   };
 };
 
@@ -178,6 +183,7 @@ describe("User-Auth Controller", () => {
 
   it("it should log In the user ", async () => {
     const mockUser = await createMockUser();
+
     const req = {
       body: { email: "ogedi@gmail.com", password: "uyiop" },
     } as unknown as Request;
@@ -197,6 +203,10 @@ describe("User-Auth Controller", () => {
       firstname: "favour",
       lastname: "uchi",
       isEmailVerified: true,
+      role:{
+        roleId:mockUser.roleId,
+        name:mockUser.role.roleName
+      }
     });
 
     expect(authUserService.findUser).toHaveBeenCalledWith("ogedi@gmail.com");
@@ -284,6 +294,10 @@ describe("User-Auth Controller", () => {
       firstname: "favour",
       lastname: "uchi",
       isEmailVerified: true,
+      role:{
+        roleId:mockUser.roleId,
+        name:mockUser.role.roleName
+      }
     });
 
 expect(res.status).toHaveBeenCalledWith(StatusCodes.CREATED);
