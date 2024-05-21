@@ -12,7 +12,6 @@ export const createNotebookSchema = () => {
       .withMessage("content is require in req body")
       .isString()
       .withMessage("content must be a string"),
-    
   ];
 };
 
@@ -38,5 +37,12 @@ export const shareNotebookSchema = () => {
     body("userIds").notEmpty().withMessage("Please provide your first name"
     ).isArray().withMessage('userIds is an array of userIds'),
     param("notebookId").notEmpty().withMessage("Please provide your last name"),
+  ]
+}
+
+export const filterNotebookSchema = () => {
+  return [
+    body("tagName").notEmpty().withMessage("Please provide your tagName to filter with"
+    )
   ]
 }

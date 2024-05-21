@@ -82,6 +82,7 @@ describe("Notebook Controller", () => {
 
   describe("getAllNoteBooksQuerySearch", () => {
     it(" it should get all notebook and perform search query with notebook title", async () => {
+      
       const mockNotebookArray: notebookService.NotebooksData = {
         pagination: {
           page: 1,
@@ -89,7 +90,7 @@ describe("Notebook Controller", () => {
           totalPages: 1,
           totalNotebooks: 1,
         },
-        notebooks: [
+        notebooks:[
           {
             id: "1",
             title: "Test Notebook",
@@ -98,8 +99,12 @@ describe("Notebook Controller", () => {
             privacy: "PRIVATE",
             createdAt: new Date(),
             updatedAt: new Date(),
+            sharedUsers:[],
+            tags:[]
           },
+          
         ],
+        
       };
 
       (

@@ -1,7 +1,12 @@
 import { NoteBook, Privacy } from "@prisma/client";
 import { prisma } from "../client";
-import { NoteBookInputData, Pagination_Notebook, SharedUsers, Tag } from "../interface";
-
+import {
+  FilterData,
+  NoteBookInputData,
+  Pagination_Notebook,
+  SharedUsers,
+  Tag,
+} from "../interface";
 
 export type NotebooksData = {
   pagination: Pagination_Notebook;
@@ -70,7 +75,7 @@ export const findNoteBookByIdService = async (
 export const getNoteBooksQueryService = async (
   query: any,
   ownerId: string
-):Promise<NotebooksData>=> {
+): Promise<NotebooksData> => {
   let limit = parseInt(query.limit || "10");
   let page = parseInt(query.page || "1");
   let startIndex = (page - 1) * limit;
@@ -84,7 +89,7 @@ export const getNoteBooksQueryService = async (
       ownerId,
       ...filterQuery,
     },
-    include:{
+    include: {
       tags: {
         select: {
           id: true,
@@ -124,7 +129,7 @@ export const updateNoteBookService = async (
   id: string,
   data: NoteBookInputData,
   tags?: string[]
-):Promise<ReturnedNoteBookData>=> {
+): Promise<ReturnedNoteBookData> => {
   if (tags && tags.length > 0) {
     const existingTags = await prisma.tag.findMany({
       where: { notes: { some: { id: id } } },
@@ -159,19 +164,20 @@ export const updateNoteBookService = async (
     },
     include: {
       tags: {
-      select: {
-        id: true,
-        name: true,
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      sharedUsers: {
+        select: {
+          id: true,
+          firstname: true,
+          lastname: true,
+          email: true,
+        },
       },
     },
-    sharedUsers: {
-      select: {
-        id: true,
-        firstname: true,
-        lastname: true,
-        email: true,
-      },
-    },},
   });
 
   return updatedNotebook;
@@ -188,7 +194,7 @@ export const shareNoteBookWithUser = async (
         connect: { id: userId },
       },
     },
-    include:{
+    include: {
       tags: {
         select: {
           id: true,
@@ -203,8 +209,46 @@ export const shareNoteBookWithUser = async (
           email: true,
         },
       },
-    }
+    },
   });
+};
+
+export const filterNoteBookByTagName = async (query: any, data: FilterData) => {
+  let limit = parseInt(query.limit || "10");
+  let page = parseInt(query.page || "1");
+  let startIndex = (page - 1) * limit;
+  const notebooks = await prisma.noteBook.findMany({
+    where: {
+      ownerId: data.ownerId,
+      tags: {
+        some: {
+          name: data.tagName,
+        },
+      },
+    },
+    take: limit,
+    skip: startIndex,
+  });
+  const totalNotebooks = await prisma.noteBook.count({
+    where: {
+      ownerId: data.ownerId,
+      tags: {
+        some: {
+          name: data.tagName,
+        },
+      },
+    },
+  });
+  const totalPages = Math.ceil(totalNotebooks / limit);
+  return {
+    pagination: {
+      page,
+      limit,
+      totalPages,
+      totalNotebooks,
+    },
+    notebooks,
+  };
 };
 
 export const deleteNoteBookService = async (id: string): Promise<NoteBook> => {

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createNoteBookController,
   deleteNoteBookController,
+  filterNoteBookByTagNameController,
   getAllNoteBooksQuerySearch,
   getNoteBookByIdServiceController,
   shareNoteBookController,
@@ -9,6 +10,7 @@ import {
 } from "../controller";
 import {
   createNotebookSchema,
+  filterNotebookSchema,
   notebookByIdSchema,
   shareNotebookSchema,
   updateNotebookSchma,
@@ -51,6 +53,13 @@ router
     shareNotebookSchema(),
     validateRequestMiddleware,
     shareNoteBookController
+  )
+  router
+  .route("/filter")
+  .get(
+    filterNotebookSchema(),
+    validateRequestMiddleware,
+    filterNoteBookByTagNameController
   )
 
 export { router as NotebookRoute };
