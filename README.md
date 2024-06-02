@@ -60,6 +60,7 @@ My Notebook API uses JWT for authentication. Include the JWT token in the Author
    JWT_EXPIRES_IN=''
    JWT_SECRET=''
    SALT=''
+   REDIS_URL=' '
 
    FRONTEND_BASE_URL=""
 
