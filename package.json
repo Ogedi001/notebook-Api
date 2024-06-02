@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "start": "npx ts-node src/app.ts",
     "dev": "nodemon --exec ts-node src/index.ts",
-    "data:import":"ts-node src/data/seed.ts"
+    "data:import": "ts-node src/data/seed.ts"
   },
   "keywords": [],
   "author": "",

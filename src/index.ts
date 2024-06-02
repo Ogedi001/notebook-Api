@@ -4,25 +4,22 @@ import logger from './Logger';
 
 const PORT = process.env.PORT ||3000
 
+ 
+ 
+const startServer = () => {
   logger.info("connected to the database");
-  
-server.listen(3000, () => {
-    logger.info(`app running on PORT:${PORT} 🔥🔥🔥`)
-})
+  server.listen(PORT, () => {
+    logger.info(`App is running @localhost:${PORT}`);
+  });
 
-
-
-
-  // Shutdown hook
-  const handleShutdown = async () => {
-    logger.info("Shutting down server...");
-    await prisma.$disconnect(); 
+  const shutdown = () => {
     server.close(() => {
       logger.info("Server is shut down");
-      process.exit(0); 
+      process.exit(0);
     });
   };
-  
-  // Listen for SIGINT and SIGTERM signals
-  process.on("SIGINT", handleShutdown);
-  process.on("SIGTERM", handleShutdown);
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
+};
+
+startServer();
